@@ -18,8 +18,8 @@ export class LoginMetaMaskComponent {
   networkVersion = window.ethereum.networkVersion;
   txHash = null;
   transactionSuccessful = false;
-  
-  errorMessage = "";
+  errorMessage = null;
+
   amountETH = 0.0006;
   merchantETHAddress = '0x65be1967fe184FC045819fe3E41c08B98Ca5Ad72'
 
@@ -35,6 +35,13 @@ export class LoginMetaMaskComponent {
       this.metaMaskAddress = address;
       console.log("Account address: " + address);
     });
+
+    window.ethereum.on('chainChanged', (chainId) => {
+      // Handle the new chain.
+      // Correctly handling chain changes can be complicated.
+      // We recommend reloading the page unless you have good reason not to.
+      window.location.reload();
+    });    
   }
 
   onSubmit(): void {
@@ -57,6 +64,7 @@ export class LoginMetaMaskComponent {
 
   onLogout(): void {
     this.isAuthenticatedWithMetaMask = false;
+    this.errorMessage = null;
   }
 
   onSendTransaction(): void {
