@@ -1,1 +1,8 @@
-# metasmask-angular-app
+# metamask-angular-app
+
+## Setup guide
+
+```
+npm install
+ng serve
+```
