@@ -1,0 +1,55 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div>
+
+  <div class="logoMetamaskSvg">
+    <img src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox-wordmark-horizontal.svg" width="180"/>
+  </div>
+
+  <div *ngIf="!isMetamaskInstalled">
+    <a class="" font-size="14px" href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn">
+      <span>Download MetaMask Chrome extension</span>
+    </a>
+  </div>  
+
+  <div *ngIf="isMetamaskInstalled && !isAuthenticatedWithMetaMask">
+    <span>Network version: {{ networkVersion }}</span>
+    <form (ngSubmit)="onSubmit()">
+      <button class="button" type="submit">Login with MetaMask</button>
+    </form>
+  </div>
+
+  <div *ngIf="isAuthenticatedWithMetaMask">
+    <span>Metamask address: </span>{{ metaMaskAddress }}
+
+    <div *ngIf="networkVersion != 1">
+      <form (ngSubmit)="onSendTransaction()">
+        <button class="button" type="submit">Send {{ amountETH }} ETH</button>
+      </form>
+
+      <div *ngIf="txHash != null">
+        <form (ngSubmit)="onCheckTransaction()">
+          <button class="button" type="submit">Check transaction {{ txHash }}</button>
+        </form>
+        
+        <div *ngIf="transactionSuccessful">
+          <span>Transaction successful</span>
+        </div>
+
+      </div>
+    </div>
+
+    <div *ngIf="networkVersion == 1">
+      <span>Use a testnet to send transaction</span>
+    </div>
+
+    <form (ngSubmit)="onLogout()">
+      <button class="button" type="submit">Logout</button>
+    </form>
+  </div>
+  
+  <div>
+    <span style="color:red;">{{ errorMessage }}</span>
+  </div>
+
+
+</div>
