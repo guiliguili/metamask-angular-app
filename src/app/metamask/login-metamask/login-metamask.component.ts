@@ -14,7 +14,7 @@ export class LoginMetaMaskComponent {
   isMetamaskInstalled = false;
   isAuthenticatedWithMetaMask = false;
   metaMaskAddress = "";
-  networkVersion = window.ethereum.networkVersion;
+  networkVersion;
   txHash = null;
   transactionSuccessful = false;
   errorMessage = null;
@@ -27,21 +27,25 @@ export class LoginMetaMaskComponent {
   ) 
   {
     this.isMetamaskInstalled = this.metaMaskService.isMetamaskInstalled();
-
     console.log("isMetamaskInstalled: " + this.isMetamaskInstalled);
 
-    this.metaMaskService.getAddress().then((address) => {
-      this.metaMaskAddress = address;
-      console.log("Account address: " + address);
-    });
+    if (this.isMetamaskInstalled)
+    {
+      this.networkVersion = window.ethereum.networkVersion;
 
-    window.ethereum.on('chainChanged', (chainId) => {
-      // Handle the new chain.
-      // Correctly handling chain changes can be complicated.
-      // We recommend reloading the page unless you have good reason not to.
-      this.networkVersion = chainId;
-      window.location.reload();
-    });    
+      this.metaMaskService.getAddress().then((address) => {
+        this.metaMaskAddress = address;
+        console.log("Account address: " + address);
+      });
+
+      window.ethereum.on('chainChanged', (chainId) => {
+        // Handle the new chain.
+        // Correctly handling chain changes can be complicated.
+        // We recommend reloading the page unless you have good reason not to.
+        this.networkVersion = chainId;
+        window.location.reload();
+      });
+    } 
   }
 
   onLogin(): void {
