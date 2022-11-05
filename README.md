@@ -8,4 +8,4 @@ ng serve
 ```
 ## Demo
 
-![metamask-ng-demo](docs/metamask-ng-demo.gif)
+![metamask-ng-demo](metamask-ng-demo.gif)
