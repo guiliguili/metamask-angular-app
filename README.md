@@ -6,3 +6,6 @@
 npm install
 ng serve
 ```
+## Demo
+
+![metamask-ng-demo](docs/metamask-ng-demo.gif)
