@@ -13,7 +13,7 @@
 
   <div *ngIf="isMetamaskInstalled && !isAuthenticatedWithMetaMask">
     <span>Network version: {{ networkVersion }}</span>
-    <form (ngSubmit)="onSubmit()">
+    <form (ngSubmit)="onLogin()">
       <button class="button" type="submit">Login with MetaMask</button>
     </form>
   </div>

@@ -4,9 +4,11 @@ import { NgModule } from "@angular/core";
 import { LoginMetaMaskComponent } from "./metamask/login-metamask/login-metamask.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
+import { HttpClientModule } from '@angular/common/http';
+
 @NgModule({
   declarations: [LoginMetaMaskComponent],
-  imports: [BrowserModule, FormsModule, ReactiveFormsModule],
+  imports: [BrowserModule, FormsModule, ReactiveFormsModule, HttpClientModule],
   providers: [],
   bootstrap: [LoginMetaMaskComponent]
 })

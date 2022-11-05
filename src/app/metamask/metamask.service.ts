@@ -1,13 +1,23 @@
 import { Injectable } from "@angular/core";
+import { HttpClient } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 import { ethers } from "ethers";
-import { nextTick } from "process";
+import { environment } from 'src/environments/environment';
 
 declare var window: any
 
 @Injectable({
   providedIn: "root"
 })
-export class SignatureService {
+export class MetaMaskService {
+
+  apiURL = "";
+
+  constructor(private httpClient: HttpClient)
+  {
+    this.apiURL = environment.apiURL; 
+  }
+
   isMetamaskInstalled() {
     return window.ethereum != null && window.ethereum.isMetaMask;
   };
@@ -15,6 +25,13 @@ export class SignatureService {
   getAddress = async () => {
     const address = await window.ethereum.request({ method: "eth_accounts" });
     return address;
+  };
+
+  generateNonce = async () => {
+    let params = new HttpParams();
+    const options = { params: params};
+    let nonce = await this.httpClient.get<any>(this.apiURL + '/metamask/generatenonce',).toPromise();
+    return nonce;
   };
 
   signMessage = async (message) => {
@@ -29,6 +46,17 @@ export class SignatureService {
     } catch (err) {
       console.log("Unable to sign: " + err);
     }
+  };
+
+  verifyMessage = async (message, address, signature) => {
+    let params = new HttpParams();
+    params = params.append('message', message);
+    params = params.append('address', address);    
+    params = params.append('signature', signature);
+
+    const options = { params: params  };
+    let verifyMessageResponse = await this.httpClient.get<any>(this.apiURL + '/metamask/verify/message', options).toPromise();
+    return verifyMessageResponse
   };
 
   sendTransaction = async (isProd, fromAddress, toAdress, amountETH) => {
@@ -72,6 +100,11 @@ export class SignatureService {
 
   checkTransactionConfirmation = async (txhash) => {
     const receipt = await window.ethereum.request({method:'eth_getTransactionReceipt', params:[txhash]})
+    return receipt;
+  }
+
+  checkTransactionConfirmationFromBackend = async (txhash) => {
+    const receipt = null;
     return receipt;
   }
 

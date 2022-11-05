@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
-import { SignatureService } from "./../signature.service";
+import { MetaMaskService } from "../metamask.service";
 
 declare var window: any
 
@@ -10,8 +10,7 @@ declare var window: any
   styleUrls: ["./login-metamask.component.css"]
 })
 export class LoginMetaMaskComponent {
-  randomBackendNumber = Math.floor(Math.random() * 1000000);
-  signMessage = "To authenticate my account, I am signing with the nonce " + this.randomBackendNumber;
+  signMessage = "";
   isMetamaskInstalled = false;
   isAuthenticatedWithMetaMask = false;
   metaMaskAddress = "";
@@ -24,14 +23,14 @@ export class LoginMetaMaskComponent {
   merchantETHAddress = '0x65be1967fe184FC045819fe3E41c08B98Ca5Ad72'
 
   constructor(
-    private signatureService: SignatureService
+    private metaMaskService: MetaMaskService
   ) 
   {
-    this.isMetamaskInstalled = this.signatureService.isMetamaskInstalled();
+    this.isMetamaskInstalled = this.metaMaskService.isMetamaskInstalled();
 
     console.log("isMetamaskInstalled: " + this.isMetamaskInstalled);
 
-    this.signatureService.getAddress().then((address) => {
+    this.metaMaskService.getAddress().then((address) => {
       this.metaMaskAddress = address;
       console.log("Account address: " + address);
     });
@@ -40,26 +39,46 @@ export class LoginMetaMaskComponent {
       // Handle the new chain.
       // Correctly handling chain changes can be complicated.
       // We recommend reloading the page unless you have good reason not to.
+      this.networkVersion = chainId;
       window.location.reload();
     });    
   }
 
-  onSubmit(): void {
-    this.errorMessage = "";    
-    console.log("Message to be be signed is: ", this.signMessage);
+  onLogin(): void {
+    this.errorMessage = "";
 
-    this.signatureService.signMessage(this.signMessage).then((res) => {
-      if (res != null)
-      {
-        console.log("Signature: " + res.signature);
-        //We should validate the signature on the backend server first
-        this.metaMaskAddress = res.address;
-        this.isAuthenticatedWithMetaMask = true;
-      }
-      else {
-        this.errorMessage = "Signature failed"
-      }
+    this.metaMaskService.generateNonce().then((res) => {
+      this.signMessage = res.nonce;
+      console.log("Message to be be signed is: ", this.signMessage);
+
+      this.metaMaskService.signMessage(this.signMessage).then((res) => {
+
+        if (res != null)
+        {
+          console.log("Signature: " + res.signature);
+          this.metaMaskAddress = res.address;
+          //Validate the signature on the backend server first
+          this.metaMaskService.verifyMessage(this.signMessage, res.address, res.signature).then((res) => {
+            if (res.valid == true)
+            {
+              console.log("Authenticated");
+              this.isAuthenticatedWithMetaMask = true;
+            }
+            else {
+              this.errorMessage = "Signature invalid "
+            }
+          }).catch((err) => {
+            console.error(err);
+            this.errorMessage = "Unable to verify the message"
+          });
+        }
+        else {
+          this.errorMessage = "Signature failed"
+        }
+      });
     });
+
+
   }
 
   onLogout(): void {
@@ -70,7 +89,7 @@ export class LoginMetaMaskComponent {
   onSendTransaction(): void {
     this.errorMessage = "";
     this.txHash = null;
-    this.signatureService.sendTransaction(false, this.metaMaskAddress, this.merchantETHAddress, this.amountETH).then((txHash) => {
+    this.metaMaskService.sendTransaction(false, this.metaMaskAddress, this.merchantETHAddress, this.amountETH).then((txHash) => {
       if (txHash != null)
       {
         console.log("txHash: " + txHash);
@@ -85,7 +104,7 @@ export class LoginMetaMaskComponent {
   onCheckTransaction(): void {
     this.transactionSuccessful = false;
 
-    this.signatureService.checkTransactionConfirmation(this.txHash).then((res) => {
+    this.metaMaskService.checkTransactionConfirmation(this.txHash).then((res) => {
       if (res != null)
       {
         console.log("Transaction " + this.txHash + " successful - " + res);
