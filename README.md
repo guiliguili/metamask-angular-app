@@ -50,3 +50,24 @@ cf push
 ```
 - Wait for **metamask-angular-app** to start
 ```
+name:              metamask-angular-app
+requested state:   started
+routes:            metamask-angular-app-palm-sitatunga-vj.cfapps.eu20.hana.ondemand.com
+last uploaded:     Tue 08 Nov 18:41:44 +08 2022
+stack:             cflinuxfs3
+buildpacks:
+	name                                              version   detect output   buildpack name
+	https://github.com/cloudfoundry/nginx-buildpack   1.1.45    nginx           nginx
+
+type:            web
+sidecars:
+instances:       1/1
+memory usage:    128M
+start command:   varify -buildpack-yml-path ./buildpack.yml ./nginx.conf $HOME/modules $DEP_DIR/nginx/modules && nginx -p $PWD -c ./nginx.conf
+     state     since                  cpu    memory   disk     logging      details
+#0   running   2022-11-08T10:41:58Z   0.0%   0 of 0   0 of 0   0/s of 0/s
+```
+- Go the the route indicated into the logs
+```
+curl 'https://metamask-angular-app-palm-sitatunga-vj.cfapps.eu20.hana.ondemand.com'
+```
