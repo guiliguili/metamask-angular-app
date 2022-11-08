@@ -1,0 +1,7 @@
+---
+applications:
+- name: metamask-angular-app
+  random-route: true
+  path: ./dist
+  memory: 128M
+  buildpack: https://github.com/cloudfoundry/nginx-buildpack
