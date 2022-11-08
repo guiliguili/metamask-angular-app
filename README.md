@@ -1,8 +1,9 @@
 # metamask-angular-app
 
 ## Local setup guide
-
+After cloning the repo, install the application and start Angular:
 ```
+cd metamask-angular-app
 npm install
 ng serve
 ```
