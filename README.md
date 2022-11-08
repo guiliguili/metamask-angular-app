@@ -21,6 +21,7 @@ cd metamask-angular-app
 - Build **metamask-angular-app**
 ```
 ng build
+cp cf/* dist
 ```
 - Login to BTP
 ```
