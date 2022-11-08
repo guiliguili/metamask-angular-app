@@ -17,6 +17,10 @@ ng serve
 ```
 cd metamask-angular-app
 ```
+- Build **metamask-angular-app**
+```
+ng build
+```
 - Login to BTP
 ```
 cf api https://api.cf.eu20.hana.ondemand.com
