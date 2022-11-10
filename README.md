@@ -20,8 +20,7 @@ cd metamask-angular-app
 ```
 - Build **metamask-angular-app**
 ```
-ng build
-cp cf/* dist
+npm run build
 ```
 - Login to BTP
 ```
@@ -46,7 +45,7 @@ space:          dev
 ```
 - Push the application (this will create the route, deploy and start the application)
 ```
-cf push
+npm run deploy
 ```
 - Wait for **metamask-angular-app** to start
 ```
@@ -70,4 +69,9 @@ start command:   varify -buildpack-yml-path ./buildpack.yml ./nginx.conf $HOME/m
 - Go the the route indicated into the logs
 ```
 curl 'https://metamask-angular-app-palm-sitatunga-vj.cfapps.eu20.hana.ondemand.com'
+```
+- Add the route to Allowed Origins CORS Filter configuration in SAP Commerce Cloud (**Environment** > **Services** > **API** > Properties)
+
+```
+corsfilter.easyrest.allowedOrigins=http://localhost:4200 https://localhost:4200 https://metamask-angular-app-palm-sitatunga-vj.cfapps.eu20.hana.ondemand.com
 ```

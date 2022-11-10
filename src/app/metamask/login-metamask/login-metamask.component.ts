@@ -80,6 +80,9 @@ export class LoginMetaMaskComponent {
           this.errorMessage = "Signature failed"
         }
       });
+    }).catch((err) => {
+      console.error(err);
+      this.errorMessage = "Unable to login"
     });
 
 
