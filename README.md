@@ -70,7 +70,7 @@ start command:   varify -buildpack-yml-path ./buildpack.yml ./nginx.conf $HOME/m
 ```
 curl 'https://metamask-angular-app-palm-sitatunga-vj.cfapps.eu20.hana.ondemand.com'
 ```
-- Add the route to Allowed Origins CORS Filter configuration in SAP Commerce Cloud (**Environment** > **Services** > **API** > Properties)
+- Add the route to Allowed Origins CORS Filter configuration in SAP Commerce Cloud (**Environment** > **Services** > **API** > **Properties**)
 
 ```
 corsfilter.easyrest.allowedOrigins=http://localhost:4200 https://localhost:4200 https://metamask-angular-app-palm-sitatunga-vj.cfapps.eu20.hana.ondemand.com
