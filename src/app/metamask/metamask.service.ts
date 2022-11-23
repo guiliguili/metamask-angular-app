@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { HttpParams } from '@angular/common/http';
 import { ethers } from "ethers";
 import { environment } from 'src/environments/environment';
+import { Observable, Subject } from 'rxjs';
 
 declare var window: any
 
@@ -11,16 +12,68 @@ declare var window: any
 })
 export class MetaMaskService {
 
+  metaMaskAddress:String;
+  networkVersion:String;
+  txhash: String;
+
   apiURL = "";
+  private subjectIsAuthenticatedWithMetaMask= new Subject();
+  private subjectErrorMessage = new Subject();
 
   constructor(private httpClient: HttpClient)
   {
     this.apiURL = environment.apiURL; 
   }
 
+  getIsAuthenticatedWithMetaMask(): Observable<any> {
+    return this.subjectIsAuthenticatedWithMetaMask.asObservable();
+  }
+
+  setIsAuthenticatedWithMetaMask(isAuthenticatedWithMetaMask: boolean) {
+    console.log("subjectIsAuthenticatedWithMetaMask: " + isAuthenticatedWithMetaMask);   
+    this.subjectIsAuthenticatedWithMetaMask.next(isAuthenticatedWithMetaMask);
+  }
+
+  getErrorMessage(): Observable<any> {
+    return this.subjectErrorMessage.asObservable();
+  }
+
+  sendErrorMessage(message: string) {
+    console.log("sendErrorMessage: " + message);    
+    this.subjectErrorMessage.next(message);
+  }
+
+  clearErrorMessage() {
+    this.subjectErrorMessage.next();
+  }
+
+  getNetworkVersion() {
+    return this.networkVersion;
+  }  
+
+  setNetworkVersion(networkVersion: string) {
+    this.networkVersion = networkVersion;
+  }
+
   isMetamaskInstalled() {
     return window.ethereum != null && window.ethereum.isMetaMask;
   };
+
+  getMetaMaskAddress() {
+    return this.metaMaskAddress;
+  }  
+
+  setMetaMaskAddress(metaMaskAddress: string) {
+    this.metaMaskAddress = metaMaskAddress;
+  }
+
+  getTxhash() {
+    return this.txhash;
+  }  
+
+  setTxhash(txhash: string) {
+    this.txhash = txhash;
+  }  
 
   getAddress = async () => {
     const address = await window.ethereum.request({ method: "eth_accounts" });
@@ -107,5 +160,13 @@ export class MetaMaskService {
     const receipt = null;
     return receipt;
   }
+
+  clearContext() {
+    this.setIsAuthenticatedWithMetaMask(false);
+    this.sendErrorMessage('');
+    this.metaMaskAddress = null;
+    this.networkVersion = null;
+    this.txhash = null; 
+  }  
 
 }
