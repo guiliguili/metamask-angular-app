@@ -12,39 +12,49 @@ declare var window: any
 })
 export class MetaMaskService {
 
-  metaMaskAddress:String;
-  networkVersion:String;
-  txhash: String;
-
   apiURL = "";
-  private subjectIsAuthenticatedWithMetaMask= new Subject();
-  private subjectErrorMessage = new Subject();
+  errorMessage: String;
+  isMetaMaskInstalled: boolean;
+  networkVersion:String;
+  metaMaskAddress:String;
+  isAuthenticatedWithMetaMask: boolean;  
+  txhash: String;
+  isTransactionSuccessful: boolean;
+
 
   constructor(private httpClient: HttpClient)
   {
-    this.apiURL = environment.apiURL; 
+    this.apiURL = environment.apiURL;
+    this.isMetaMaskInstalled = false;
+    this.networkVersion=null;    
+    this.clearContext();
+
+    var isMetaMaskInstalled = this.checkMetaMaskInstalled();
+    this.setIsMetaMaskInstalled(isMetaMaskInstalled);    
   }
 
-  getIsAuthenticatedWithMetaMask(): Observable<any> {
-    return this.subjectIsAuthenticatedWithMetaMask.asObservable();
+  clearContext() {
+    this.errorMessage = null;
+    this.metaMaskAddress = null;
+    this.isAuthenticatedWithMetaMask = false;
+    this.txhash = null;
+    this.isTransactionSuccessful = false;     
+  }  
+
+  getErrorMessage() {
+    return this.errorMessage;
   }
 
-  setIsAuthenticatedWithMetaMask(isAuthenticatedWithMetaMask: boolean) {
-    console.log("subjectIsAuthenticatedWithMetaMask: " + isAuthenticatedWithMetaMask);   
-    this.subjectIsAuthenticatedWithMetaMask.next(isAuthenticatedWithMetaMask);
+  setErrorMessage(errorMessage: string) {
+    this.errorMessage = errorMessage;
   }
 
-  getErrorMessage(): Observable<any> {
-    return this.subjectErrorMessage.asObservable();
+  getIsMetaMaskInstalled() {
+    return this.isMetaMaskInstalled;
   }
 
-  sendErrorMessage(message: string) {
-    console.log("sendErrorMessage: " + message);    
-    this.subjectErrorMessage.next(message);
-  }
-
-  clearErrorMessage() {
-    this.subjectErrorMessage.next();
+  setIsMetaMaskInstalled(isMetaMaskInstalled: boolean) {  
+    this.isMetaMaskInstalled = isMetaMaskInstalled;
   }
 
   getNetworkVersion() {
@@ -55,10 +65,6 @@ export class MetaMaskService {
     this.networkVersion = networkVersion;
   }
 
-  isMetamaskInstalled() {
-    return window.ethereum != null && window.ethereum.isMetaMask;
-  };
-
   getMetaMaskAddress() {
     return this.metaMaskAddress;
   }  
@@ -67,15 +73,35 @@ export class MetaMaskService {
     this.metaMaskAddress = metaMaskAddress;
   }
 
+  getIsAuthenticatedWithMetaMask() {
+    return this.isAuthenticatedWithMetaMask;
+  }
+
+  setIsAuthenticatedWithMetaMask(isAuthenticatedWithMetaMask: boolean) {  
+    this.isAuthenticatedWithMetaMask = isAuthenticatedWithMetaMask;
+  }  
+
   getTxhash() {
     return this.txhash;
   }  
 
   setTxhash(txhash: string) {
     this.txhash = txhash;
+  }
+
+  getIsTransactionSuccessful() {
+    return this.isTransactionSuccessful;
+  }
+  
+  setIsTransactionSuccessful(isTransactionSuccessful: boolean) {
+    this.isTransactionSuccessful = isTransactionSuccessful;
   }  
 
-  getAddress = async () => {
+  checkMetaMaskInstalled() {
+    return window.ethereum != null && window.ethereum.isMetaMask;
+  };
+
+  requestMetaMaskAddress = async () => {
     const address = await window.ethereum.request({ method: "eth_accounts" });
     return address;
   };
@@ -160,13 +186,5 @@ export class MetaMaskService {
     const receipt = null;
     return receipt;
   }
-
-  clearContext() {
-    this.setIsAuthenticatedWithMetaMask(false);
-    this.sendErrorMessage('');
-    this.metaMaskAddress = null;
-    this.networkVersion = null;
-    this.txhash = null; 
-  }  
 
 }

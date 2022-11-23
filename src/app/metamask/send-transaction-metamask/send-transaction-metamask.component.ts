@@ -9,12 +9,6 @@ import { MetaMaskService } from "../metamask.service";
 })
 export class SendTransactionMetamaskComponent implements OnInit {
 
-  subscriptionMetaMaskAddress : Subscription;
-  metaMaskAddress = "";
-
-  txHash = null;
-  transactionSuccessful = false;
-
   amountETH = 0.0006;
   merchantETHAddress = '0x65be1967fe184FC045819fe3E41c08B98Ca5Ad72'
   
@@ -24,18 +18,16 @@ export class SendTransactionMetamaskComponent implements OnInit {
   }
 
   onSendTransaction(): void {
-    this.metaMaskService.clearErrorMessage;
-    this.txHash = null;
+    this.metaMaskService.setErrorMessage(null);
     this.metaMaskService.setTxhash(null);
     this.metaMaskService.sendTransaction(false, this.metaMaskService.getMetaMaskAddress(), this.merchantETHAddress, this.amountETH).then((txHash) => {
       if (txHash != null)
       {
         console.log("txHash: " + txHash);
         this.metaMaskService.setTxhash(txHash);
-        this.txHash = txHash;
       }
       else {
-        this.metaMaskService.sendErrorMessage('Transaction failed');
+        this.metaMaskService.setErrorMessage('Transaction failed');
       }
     }); 
   }
