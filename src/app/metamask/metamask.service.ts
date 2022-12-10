@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { HttpParams } from '@angular/common/http';
 import { ethers } from "ethers";
 import { environment } from 'src/environments/environment';
-import { Observable, Subject } from 'rxjs';
 
 declare var window: any
 
@@ -13,20 +12,20 @@ declare var window: any
 export class MetaMaskService {
 
   apiURL = "";
-  errorMessage: String;
+  errorMessage: string = "";
   isMetaMaskInstalled: boolean;
-  networkVersion:String;
-  metaMaskAddress:String;
-  isAuthenticatedWithMetaMask: boolean;  
-  txhash: String;
-  isTransactionSuccessful: boolean;
+  networkVersion:string;
+  metaMaskAddress:string = "";
+  isAuthenticatedWithMetaMask: boolean = false;  
+  txhash: string = "";
+  isTransactionSuccessful: boolean = false;
 
 
   constructor(private httpClient: HttpClient)
   {
     this.apiURL = environment.apiURL;
     this.isMetaMaskInstalled = false;
-    this.networkVersion=null;    
+    this.networkVersion="";    
     this.clearContext();
 
     var isMetaMaskInstalled = this.checkMetaMaskInstalled();
@@ -34,10 +33,10 @@ export class MetaMaskService {
   }
 
   clearContext() {
-    this.errorMessage = null;
-    this.metaMaskAddress = null;
+    this.errorMessage = "";
+    this.metaMaskAddress = "";
     this.isAuthenticatedWithMetaMask = false;
-    this.txhash = null;
+    this.txhash = "";
     this.isTransactionSuccessful = false;     
   }  
 
@@ -113,7 +112,7 @@ export class MetaMaskService {
     return nonce;
   };
 
-  signMessage = async (message) => {
+  signMessage = async (message:string) => {
     try {
       await window.ethereum.request({ method: "eth_requestAccounts" });
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -124,10 +123,11 @@ export class MetaMaskService {
       return { signature: signature, address: address}; 
     } catch (err) {
       console.log("Unable to sign: " + err);
+      return null;
     }
   };
 
-  verifyMessage = async (message, address, signature) => {
+  verifyMessage = async (message:string, address:string, signature:string) => {
     let params = new HttpParams();
     params = params.append('message', message);
     params = params.append('address', address);    
@@ -138,7 +138,7 @@ export class MetaMaskService {
     return verifyMessageResponse
   };
 
-  sendTransaction = async (isProd, fromAddress, toAdress, amountETH) => {
+  sendTransaction = async (isProd:boolean, fromAddress:string, toAdress:string, amountETH:number) => {
     try {
       const networkVersion = window.ethereum.networkVersion;
       if (isProd && networkVersion !=1)
@@ -177,12 +177,12 @@ export class MetaMaskService {
     }
   };
 
-  checkTransactionConfirmation = async (txhash) => {
+  checkTransactionConfirmation = async (txhash:string) => {
     const receipt = await window.ethereum.request({method:'eth_getTransactionReceipt', params:[txhash]})
     return receipt;
   }
 
-  checkTransactionConfirmationFromBackend = async (txhash) => {
+  checkTransactionConfirmationFromBackend = async (txhash:string) => {
     const receipt = null;
     return receipt;
   }

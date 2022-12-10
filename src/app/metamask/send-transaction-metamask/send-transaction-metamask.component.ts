@@ -18,8 +18,8 @@ export class SendTransactionMetamaskComponent implements OnInit {
   }
 
   onSendTransaction(): void {
-    this.metaMaskService.setErrorMessage(null);
-    this.metaMaskService.setTxhash(null);
+    this.metaMaskService.setErrorMessage("");
+    this.metaMaskService.setTxhash("");
     this.metaMaskService.sendTransaction(false, this.metaMaskService.getMetaMaskAddress(), this.merchantETHAddress, this.amountETH).then((txHash) => {
       if (txHash != null)
       {

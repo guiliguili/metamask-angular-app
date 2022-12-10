@@ -1,4 +1,4 @@
-<div *ngIf="this.metaMaskService.getTxhash() != null">
+<div *ngIf="this.metaMaskService.getTxhash() != ''">
     <form (ngSubmit)="onCheckTransaction()">
       <button class="button" type="submit">Check transaction {{ this.metaMaskService.getTxhash() }}</button>
     </form>

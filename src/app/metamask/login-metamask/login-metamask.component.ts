@@ -11,7 +11,7 @@ declare var window: any
 })
 export class LoginMetaMaskComponent {
 
-  signMessage;
+  signMessage: string = "";
 
   constructor(
     private metaMaskService: MetaMaskService
@@ -26,7 +26,7 @@ export class LoginMetaMaskComponent {
         this.metaMaskService.setMetaMaskAddress(address);
       });
 
-      window.ethereum.on('chainChanged', (chainId) => {
+      window.ethereum.on('chainChanged', (chainId:string) => {
         // Handle the new chain.
         // Correctly handling chain changes can be complicated.
         // We recommend reloading the page unless you have good reason not to.
@@ -37,7 +37,7 @@ export class LoginMetaMaskComponent {
   }
 
   onLogin(): void {
-    this.metaMaskService.setErrorMessage(null);
+    this.metaMaskService.setErrorMessage("");
 
     this.metaMaskService.generateNonce().then((res) => {
       this.signMessage = res.nonce;
