@@ -1,9 +1,9 @@
-<div *ngIf="this.metaMaskService.getNetworkVersion != 1">
+<div *ngIf="this.metaMaskService.getNetworkVersion() != 1">
   <form (ngSubmit)="onSendTransaction()">
     <button class="button" type="submit">Send {{ amountETH }} ETH</button>
   </form>
 </div>
 
-<div *ngIf="this.metaMaskService.getNetworkVersion == 1">
+<div *ngIf="this.metaMaskService.getNetworkVersion() == 1">
   <span>Use a testnet to send transaction</span>
 </div>
