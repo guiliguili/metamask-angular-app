@@ -14,7 +14,7 @@ export class MetaMaskService {
   apiURL = "";
   errorMessage: string = "";
   isMetaMaskInstalled: boolean;
-  networkVersion:string;
+  networkVersion:number;
   metaMaskAddress:string = "";
   isAuthenticatedWithMetaMask: boolean = false;  
   txhash: string = "";
@@ -23,9 +23,9 @@ export class MetaMaskService {
 
   constructor(private httpClient: HttpClient)
   {
-    this.apiURL = environment.apiURL;
+    this.apiURL = environment.easyRestURL;
     this.isMetaMaskInstalled = false;
-    this.networkVersion="";    
+    this.networkVersion=1;    
     this.clearContext();
 
     var isMetaMaskInstalled = this.checkMetaMaskInstalled();
@@ -60,7 +60,7 @@ export class MetaMaskService {
     return this.networkVersion;
   }  
 
-  setNetworkVersion(networkVersion: string) {
+  setNetworkVersion(networkVersion: number) {
     this.networkVersion = networkVersion;
   }
 

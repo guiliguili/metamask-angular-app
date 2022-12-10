@@ -26,7 +26,7 @@ export class LoginMetaMaskComponent {
         this.metaMaskService.setMetaMaskAddress(address);
       });
 
-      window.ethereum.on('chainChanged', (chainId:string) => {
+      window.ethereum.on('chainChanged', (chainId:number) => {
         // Handle the new chain.
         // Correctly handling chain changes can be complicated.
         // We recommend reloading the page unless you have good reason not to.
