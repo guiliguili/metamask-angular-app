@@ -1,85 +1,45 @@
-import { Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnDestroy } from "@angular/core";
 import { MetaMaskService } from "../metamask.service";
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from "rxjs";
 
-declare var window: any
+declare var window: any;
 
 @Component({
   selector: "app-login-metamask",
   templateUrl: "./login-metamask.component.html",
-  styleUrls: ["./login-metamask.component.css"]
+  styleUrls: ["./login-metamask.component.css"],
 })
-export class LoginMetaMaskComponent {
+export class LoginMetaMaskComponent implements OnDestroy {
+  protected subscriptions = new Subscription();
+  protected error$ = new BehaviorSubject<string | undefined>(undefined);
+  protected success$ = new BehaviorSubject<string | undefined>(undefined);
 
-  signMessage: string = "";
+  protected networkVersion: number | undefined;
 
-  constructor(
-    private metaMaskService: MetaMaskService
-  ) {}
+  constructor(protected metaMaskService: MetaMaskService) {}
 
   ngOnInit(): void {
-    if (this.metaMaskService.getIsMetaMaskInstalled())
-    {
-      this.metaMaskService.setNetworkVersion(window.ethereum.networkVersion);
-
-      this.metaMaskService.requestMetaMaskAddress().then((address) => {
-        this.metaMaskService.setMetaMaskAddress(address);
-      });
-
-      window.ethereum.on('chainChanged', (chainId:number) => {
-        // Handle the new chain.
-        // Correctly handling chain changes can be complicated.
-        // We recommend reloading the page unless you have good reason not to.
-        this.metaMaskService.setNetworkVersion(chainId);
-        window.location.reload();
-      });
-    } 
+    if (this.metaMaskService.isEthereumInstalled) {
+      this.metaMaskService.requestAccount();
+      this.subscriptions.add(
+        this.metaMaskService.networkVersion.subscribe((networkVersion) => {
+          console.log("networkVersion changed", networkVersion);
+          this.networkVersion = networkVersion;
+        })
+      );
+    }
   }
 
   onLogin(): void {
-    this.metaMaskService.setErrorMessage("");
-
-    this.metaMaskService.generateNonce().then((res) => {
-      this.signMessage = res.nonce;
-      console.log("Message to be be signed is: ", this.signMessage);
-
-      this.metaMaskService.signMessage(this.signMessage).then((res) => {
-
-        if (res != null)
-        {
-          console.log("Signature: " + res.signature);
-          this.metaMaskService.setMetaMaskAddress(res.address);
-          //Validate the signature on the backend server first
-          this.metaMaskService.verifyMessage(this.signMessage, res.address, res.signature).then((res) => {
-            if (res.valid == true)
-            {
-              console.log("Authenticated");
-              this.metaMaskService.setIsAuthenticatedWithMetaMask(true);
-            }
-            else {
-              //this.errorMessage = "Signature invalid"
-              this.metaMaskService.setErrorMessage('Signature invalid');
-            }
-          }).catch((err) => {
-            console.error(err);
-            //this.errorMessage = "Unable to verify the message"
-            this.metaMaskService.setErrorMessage('Unable to verify the message');
-          });
-        }
-        else {
-          //this.errorMessage = "Signature failed"
-          this.metaMaskService.setErrorMessage('Signature failed');
-        }
-      });
-    }).catch((err) => {
+    this.error$.next(undefined);
+    this.success$.next(undefined);
+    this.metaMaskService.login().catch((err) => {
       console.error(err);
-      //this.errorMessage = "Unable to login"
-      this.metaMaskService.setErrorMessage('Unable to login');
+      this.error$.next(err);
     });
-
   }
 
   ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
-
 }

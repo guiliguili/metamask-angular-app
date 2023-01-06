@@ -1,4 +1,6 @@
-<span>Network version: {{ this.metaMaskService.getNetworkVersion() }}</span>
+<span>Network version: {{ this.networkVersion }}</span>
 <form (ngSubmit)="onLogin()">
   <button class="button" type="submit">Login with MetaMask</button>
 </form>
+<div class="success">{{ success$ | async}}</div>
+<div class="error">{{ error$ | async}}</div>

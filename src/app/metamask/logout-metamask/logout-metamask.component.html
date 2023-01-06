@@ -1,3 +1,5 @@
 <form (ngSubmit)="onLogout()">
     <button class="button" type="submit">Logout</button>
 </form>
+<div class="success">{{ success$ | async}}</div>
+<div class="error">{{ error$ | async}}</div>
