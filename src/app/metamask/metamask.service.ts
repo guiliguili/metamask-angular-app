@@ -3,7 +3,6 @@ import { Injectable } from "@angular/core";
 import { ethers } from "ethers";
 import { BehaviorSubject, Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { environment } from "src/environments/environment";
 
 declare var window: any;
 
@@ -11,12 +10,14 @@ interface Nonce {
   nonce?: string;
 }
 
+export abstract class BackendUrlProvider {
+  abstract getBackendUrl(path: string): string;
+}
+
 @Injectable({
   providedIn: "root",
 })
 export class MetaMaskService {
-  protected apiURL = "";
-
   protected provider?: ethers.providers.Web3Provider;
 
   protected _network: ethers.providers.Network | undefined = undefined;
@@ -96,8 +97,10 @@ export class MetaMaskService {
     return this._isAuthenticated$.asObservable();
   }
 
-  constructor(private httpClient: HttpClient) {
-    this.apiURL = environment.easyRestURL;
+  constructor(
+    protected httpClient: HttpClient,
+    protected backendUrlProvider: BackendUrlProvider
+  ) {
     if (this.isEthereumInstalled) {
       this.provider = new ethers.providers.Web3Provider(this.ethereum, "any");
       this.ethereum.on("accountsChanged", (accounts: string[]) =>
@@ -114,7 +117,7 @@ export class MetaMaskService {
   }
 
   protected getBackendUrl(path: string): string {
-    return `${this.apiURL}${path}`;
+    return this.backendUrlProvider.getBackendUrl(path);
   }
 
   protected onAccountsChanged(accounts: string[]) {
