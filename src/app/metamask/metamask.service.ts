@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { ethers } from "ethers";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, from, Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
 declare var window: any;
@@ -10,8 +10,19 @@ interface Nonce {
   nonce?: string;
 }
 
+export interface VerificationResponse {
+  valid?: boolean;
+  payload?: any;
+}
+
 export abstract class BackendUrlProvider {
   abstract getBackendUrl(path: string): string;
+}
+
+export abstract class AuthStorage {
+  abstract set(payload: any): void;
+  abstract get(): any;
+  abstract get$(): Observable<any>;
 }
 
 @Injectable({
@@ -25,9 +36,8 @@ export class MetaMaskService implements OnDestroy {
     ethers.providers.Network | undefined
   >(this.network);
 
-  protected _isAuthenticated = false;
-  protected _isAuthenticated$ = new BehaviorSubject<boolean>(
-    this.isAuthenticated
+  protected _isAuthenticated$ = from(this.authStorage.get$()).pipe(
+    map((payload) => payload !== undefined)
   );
 
   protected _account: string | undefined = undefined;
@@ -66,7 +76,7 @@ export class MetaMaskService implements OnDestroy {
     if (this._account !== account) {
       this._account = account;
       this._account$.next(account);
-      this.isAuthenticated = false;
+      this.authStorage.set(undefined);
     }
   }
 
@@ -85,21 +95,17 @@ export class MetaMaskService implements OnDestroy {
   }
 
   get isAuthenticated(): boolean {
-    return this._isAuthenticated;
-  }
-
-  protected set isAuthenticated(isAuthenticated: boolean) {
-    this._isAuthenticated = isAuthenticated;
-    this._isAuthenticated$.next(isAuthenticated);
+    return this.authStorage.get() !== undefined;
   }
 
   get isAuthenticated$(): Observable<boolean> {
-    return this._isAuthenticated$.asObservable();
+    return this._isAuthenticated$;
   }
 
   constructor(
     protected httpClient: HttpClient,
-    protected backendUrlProvider: BackendUrlProvider
+    protected backendUrlProvider: BackendUrlProvider,
+    protected authStorage: AuthStorage
   ) {
     if (this.isEthereumInstalled) {
       this.provider = new ethers.providers.Web3Provider(this.ethereum, "any");
@@ -167,7 +173,10 @@ export class MetaMaskService implements OnDestroy {
 
     const options = { params: params };
     let verifyMessageResponse = await this.httpClient
-      .get<any>(this.getBackendUrl("/metamask/verify/message"), options)
+      .get<VerificationResponse>(
+        this.getBackendUrl("/metamask/verify/message"),
+        options
+      )
       .toPromise();
     return verifyMessageResponse;
   };
@@ -183,7 +192,7 @@ export class MetaMaskService implements OnDestroy {
   };
 
   requestLogin = async () => {
-    this.isAuthenticated = false;
+    this.authStorage.set(undefined);
 
     const signer = await this.getSigner();
     const res = await this.generateNonce();
@@ -207,7 +216,7 @@ export class MetaMaskService implements OnDestroy {
           if (res.valid === true) {
             console.log(`Authenticated ${this.account}`);
             if (this.account !== undefined) {
-              this.isAuthenticated = true;
+              this.authStorage.set(res.payload ?? null);
               return this.account;
             } else {
               throw Error("No account to login to");
@@ -221,7 +230,7 @@ export class MetaMaskService implements OnDestroy {
   };
 
   logout = async () => {
-    this.isAuthenticated = false;
+    this.authStorage.set(undefined);
   };
 
   requestSendTransaction = async (

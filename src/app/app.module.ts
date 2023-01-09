@@ -10,7 +10,8 @@ import { SendTransactionMetamaskComponent } from "./metamask/send-transaction-me
 import { CheckTransactionMetamaskComponent } from "./metamask/check-transaction-metamask/check-transaction-metamask.component";
 import { ConnectMetamaskComponent } from "./metamask/connect-metamask/connect-metamask.component";
 import { EnvironmentBackendUrlProviderService } from "./metamask/environment-backend-url-provider.service";
-import { BackendUrlProvider } from "./metamask/metamask.service";
+import { AuthStorage, BackendUrlProvider } from "./metamask/metamask.service";
+import { InMemoryAuthStorageService } from "./metamask/in-memory-auth-storage.service";
 
 @NgModule({
   declarations: [
@@ -26,6 +27,10 @@ import { BackendUrlProvider } from "./metamask/metamask.service";
     {
       provide: BackendUrlProvider,
       useClass: EnvironmentBackendUrlProviderService,
+    },
+    {
+      provide: AuthStorage,
+      useClass: InMemoryAuthStorageService,
     },
   ],
   bootstrap: [AppComponent],
