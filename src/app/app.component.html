@@ -7,7 +7,7 @@
       width="180" />
   </div>
 
-  <div *ngIf="!this.metaMaskService.isMetaMask; else metamask">
+  <div *ngIf="!isMetaMask; else metamask">
     <a class="" font-size="14px"
       href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn">
       <span>Download MetaMask Chrome extension</span>

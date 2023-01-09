@@ -27,12 +27,12 @@ export class LogoutMetamaskComponent implements OnInit {
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.metaMaskService.isAuthenticated$.subscribe((_) => {
+      this.isAuthenticated$.subscribe((_) => {
         this.changeDetectorRef.detectChanges();
       })
     );
     this.subscriptions.add(
-      this.metaMaskService.isConnected$.subscribe((_) => {
+      this.isConnected$.subscribe((_) => {
         this.changeDetectorRef.detectChanges();
       })
     );

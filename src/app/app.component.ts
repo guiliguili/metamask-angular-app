@@ -19,6 +19,10 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.metaMaskService.isAuthenticated$;
   }
 
+  get isMetaMask() {
+    return this.metaMaskService.isMetaMask;
+  }
+
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
     protected metaMaskService: MetaMaskService

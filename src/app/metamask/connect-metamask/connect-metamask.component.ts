@@ -25,19 +25,17 @@ export class ConnectMetamaskComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    if (this.metaMaskService.isEthereumInstalled) {
-      this.changeDetectorRef.detectChanges();
-      this.subscriptions.add(
-        this.account$.subscribe((_) => {
-          this.changeDetectorRef.detectChanges();
-        })
-      );
-      this.subscriptions.add(
-        this.isConnected$.subscribe((_) => {
-          this.changeDetectorRef.detectChanges();
-        })
-      );
-    }
+    this.changeDetectorRef.detectChanges();
+    this.subscriptions.add(
+      this.account$.subscribe((_) => {
+        this.changeDetectorRef.detectChanges();
+      })
+    );
+    this.subscriptions.add(
+      this.isConnected$.subscribe((_) => {
+        this.changeDetectorRef.detectChanges();
+      })
+    );
   }
 
   onConnect(): void {
