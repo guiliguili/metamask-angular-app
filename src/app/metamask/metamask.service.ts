@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { ethers } from "ethers";
 import { BehaviorSubject, Observable } from "rxjs";
 import { map } from "rxjs/operators";
@@ -17,7 +17,7 @@ export abstract class BackendUrlProvider {
 @Injectable({
   providedIn: "root",
 })
-export class MetaMaskService {
+export class MetaMaskService implements OnDestroy {
   protected provider?: ethers.providers.Web3Provider;
 
   protected _network: ethers.providers.Network | undefined = undefined;
@@ -250,4 +250,9 @@ export class MetaMaskService {
     const receipt = null;
     return receipt;
   };
+
+  ngOnDestroy(): void {
+    console.log("ngOnDestroy");
+    this.provider?.removeAllListeners();
+  }
 }
