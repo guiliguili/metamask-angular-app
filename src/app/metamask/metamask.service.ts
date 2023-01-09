@@ -173,9 +173,13 @@ export class MetaMaskService implements OnDestroy {
   };
 
   requestAccount = async () => {
-    return this.provider
-      ?.send("eth_requestAccounts", [])
-      .then(() => this.account);
+    return this.provider?.send("eth_requestAccounts", []).then((_) => {
+      if (this.account !== undefined) {
+        return this.account;
+      } else {
+        throw Error("No account to connect");
+      }
+    });
   };
 
   requestLogin = async () => {
@@ -202,8 +206,12 @@ export class MetaMaskService implements OnDestroy {
           const res = await this.verifyMessage(nonce, address, signature);
           if (res.valid === true) {
             console.log(`Authenticated ${this.account}`);
-            this.isAuthenticated = true;
-            return this.account;
+            if (this.account !== undefined) {
+              this.isAuthenticated = true;
+              return this.account;
+            } else {
+              throw Error("No account to login to");
+            }
           } else {
             throw new Error("Signature invalid");
           }
