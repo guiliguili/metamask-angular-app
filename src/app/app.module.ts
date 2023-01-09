@@ -8,12 +8,13 @@ import { LoginMetaMaskComponent } from "./metamask/login-metamask/login-metamask
 import { LogoutMetamaskComponent } from './metamask/logout-metamask/logout-metamask.component';
 import { SendTransactionMetamaskComponent } from './metamask/send-transaction-metamask/send-transaction-metamask.component';
 import { CheckTransactionMetamaskComponent } from './metamask/check-transaction-metamask/check-transaction-metamask.component';
+import { ConnectMetamaskComponent } from './metamask/connect-metamask/connect-metamask.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginMetaMaskComponent, 
-    LogoutMetamaskComponent, SendTransactionMetamaskComponent, CheckTransactionMetamaskComponent],
+    LogoutMetamaskComponent, SendTransactionMetamaskComponent, CheckTransactionMetamaskComponent, ConnectMetamaskComponent],
   imports: [BrowserModule, FormsModule, ReactiveFormsModule, HttpClientModule],
   providers: [],
   bootstrap: [AppComponent]

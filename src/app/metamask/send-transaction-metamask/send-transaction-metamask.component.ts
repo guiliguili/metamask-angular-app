@@ -5,10 +5,11 @@ import {
   FormGroup,
   Validators,
 } from "@angular/forms";
-import { BehaviorSubject, Subscription } from "rxjs";
+import { BehaviorSubject } from "rxjs";
+import { map } from "rxjs/operators";
 import { MetaMaskService } from "../metamask.service";
 
-const merchantETHAddress = "0x65be1967fe184FC045819fe3E41c08B98Ca5Ad72";
+const DEFAULT_MERCHANT_ADDRESS = "0x65be1967fe184FC045819fe3E41c08B98Ca5Ad72";
 
 @Component({
   selector: "app-send-transaction-metamask",
@@ -22,18 +23,41 @@ export class SendTransactionMetamaskComponent implements OnInit {
 
   protected form: FormGroup = this.fb.group({
     amount: ["", Validators.required],
+    toAddress: ["", Validators.required],
   });
+
+  get formInvalid(): boolean {
+    return this.form.invalid;
+  }
 
   get amountControl(): FormControl {
     return this.form.controls["amount"] as FormControl;
   }
 
-  get amount(): string {
+  get amount(): number {
     return this.amountControl.value;
   }
 
-  get networkVersion() {
-    return this.metaMaskService.networkVersion;
+  set amount(amount: number) {
+    this.amountControl.setValue(amount);
+  }
+
+  get toAddressControl(): FormControl {
+    return this.form.controls["toAddress"] as FormControl;
+  }
+
+  get toAddress(): string {
+    return this.toAddressControl.value;
+  }
+
+  set toAddress(toAddress: string) {
+    this.toAddressControl.setValue(toAddress);
+  }
+
+  get networkId$() {
+    return this.metaMaskService.network$.pipe(
+      map((network) => network?.chainId)
+    );
   }
 
   constructor(
@@ -41,16 +65,21 @@ export class SendTransactionMetamaskComponent implements OnInit {
     protected metaMaskService: MetaMaskService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.amount = 0.0042;
+    this.toAddress = DEFAULT_MERCHANT_ADDRESS;
+  }
 
   onSendTransaction(): void {
+    this.success$.next(undefined);
     this.error$.next(undefined);
     this.metaMaskService
-      .sendTransaction(false, merchantETHAddress, this.amount)
+      .requestSendTransaction(false, this.toAddress, this.amount.toString())
       .then((txHash) => {
-        console.log("txHash: " + txHash);
-        this.txHash$.next(txHash);
-        if (txHash === null) {
+        console.log(`txHash: ${txHash}`);
+        if (txHash !== null) {
+          this.success$.next(`Transaction succesfully sent: ${txHash}`);
+        } else {
           console.error("Transaction failed");
         }
       })

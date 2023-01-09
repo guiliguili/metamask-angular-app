@@ -16,6 +16,10 @@ export class CheckTransactionMetamaskComponent implements OnInit {
     txHash: [""],
   });
 
+  get formInvalid(): boolean {
+    return this.form.invalid;
+  }
+
   get txHashControl(): FormControl {
     return this.form.controls["txHash"] as FormControl;
   }
@@ -38,11 +42,11 @@ export class CheckTransactionMetamaskComponent implements OnInit {
       .checkTransactionConfirmation(this.txHash)
       .then((res) => {
         if (res != null) {
-          const message = `Transaction  ${this.txHash} successful - ${res}`;
+          const message = `Transaction details: ${JSON.stringify(res)}`;
           console.log(message);
           this.success$.next(message);
         } else {
-          const message = `Transaction  ${this.txHash} not completed`;
+          const message = `Transaction  ${this.txHash} does not exits!`;
           console.error(message);
           this.error$.next(message);
         }

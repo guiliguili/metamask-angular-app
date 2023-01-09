@@ -1,4 +1,6 @@
-import { Component } from "@angular/core";
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from "@angular/core";
+import { Subscription } from "rxjs";
+import { map } from "rxjs/operators";
 import { MetaMaskService } from "./metamask/metamask.service";
 
 @Component({
@@ -6,6 +8,36 @@ import { MetaMaskService } from "./metamask/metamask.service";
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.css"],
 })
-export class AppComponent {
-  constructor(protected metaMaskService: MetaMaskService) {}
+export class AppComponent implements OnInit, OnDestroy {
+  protected subscriptions = new Subscription();
+
+  get network$() {
+    return this.metaMaskService.network$;
+  }
+
+  get isAuthenticated$() {
+    return this.metaMaskService.isAuthenticated$;
+  }
+
+  constructor(
+    protected changeDetectorRef: ChangeDetectorRef,
+    protected metaMaskService: MetaMaskService
+  ) {}
+
+  ngOnInit(): void {
+    this.subscriptions.add(
+      this.network$.subscribe((_) => {
+        this.changeDetectorRef.detectChanges();
+      })
+    );
+    this.subscriptions.add(
+      this.isAuthenticated$.subscribe((_) => {
+        this.changeDetectorRef.detectChanges();
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
 }

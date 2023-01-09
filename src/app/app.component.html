@@ -7,27 +7,25 @@
       width="180" />
   </div>
 
-  <div *ngIf="!this.metaMaskService.isMetaMask">
+  <div *ngIf="!this.metaMaskService.isMetaMask; else metamask">
     <a class="" font-size="14px"
       href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn">
       <span>Download MetaMask Chrome extension</span>
     </a>
   </div>
 
-  <div *ngIf="this.metaMaskService.isMetaMask && !(this.metaMaskService.isAuthenticated | async)">
+  <ng-template #metamask>
+    <p>Network: <b>{{ (network$ | async)?.name }}</b><em>(id={{ (network$ | async)?.chainId }})</em></p>
+    <app-connect-metamask></app-connect-metamask>
     <app-login-metamask></app-login-metamask>
-  </div>
-
-  <div *ngIf="this.metaMaskService.isAuthenticated | async">
-
-    <span>MetaMask address: </span>{{ this.metaMaskService.account | async }}
-
     <app-logout-metamask></app-logout-metamask>
 
-    <app-send-transaction-metamask></app-send-transaction-metamask>
-    <app-check-transaction-metamask></app-check-transaction-metamask>
 
-  </div>
+    <div *ngIf="isAuthenticated$ | async">
+      <app-send-transaction-metamask></app-send-transaction-metamask>
+      <app-check-transaction-metamask></app-check-transaction-metamask>
+    </div>
+  </ng-template>
 
 
 </div>
