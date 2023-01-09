@@ -173,7 +173,9 @@ export class MetaMaskService implements OnDestroy {
   };
 
   requestAccount = async () => {
-    return this.provider?.send("eth_requestAccounts", []);
+    return this.provider
+      ?.send("eth_requestAccounts", [])
+      .then(() => this.account);
   };
 
   requestLogin = async () => {
