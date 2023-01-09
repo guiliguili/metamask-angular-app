@@ -62,8 +62,11 @@ export class MetaMaskService {
   }
 
   protected set account(account: string | undefined) {
-    this._account = account;
-    this._account$.next(account);
+    if (this._account !== account) {
+      this._account = account;
+      this._account$.next(account);
+      this.isAuthenticated = false;
+    }
   }
 
   get account$(): Observable<string | undefined> {
@@ -116,16 +119,18 @@ export class MetaMaskService {
 
   protected onAccountsChanged(accounts: string[]) {
     console.log("onAccountsChanged", accounts);
+    var account: string | undefined;
     if (accounts === undefined || accounts.length === 0) {
-      this.account = undefined;
+      account = undefined;
     } else {
-      const account = accounts[0];
+      account = accounts[0];
       if (accounts.length > 1) {
-        console.warn("More than one account connected");
+        console.warn(
+          `More than one account connected: ${accounts}. '${account}' will be used`
+        );
       }
-      this.account = account;
     }
-    this.isAuthenticated = false;
+    this.account = account;
   }
 
   protected onChainChanged(chainId: string) {
