@@ -21,7 +21,6 @@ export abstract class BackendUrlProvider {
 
 export abstract class AuthStorage {
   abstract set(payload: any): void;
-  abstract get(): any;
   abstract get$(): Observable<any>;
 }
 
@@ -92,10 +91,6 @@ export class MetaMaskService implements OnDestroy {
     return this._account$.pipe(
       map((account) => account !== undefined && account !== null)
     );
-  }
-
-  get isAuthenticated(): boolean {
-    return this.authStorage.get() !== undefined;
   }
 
   get isAuthenticated$(): Observable<boolean> {
