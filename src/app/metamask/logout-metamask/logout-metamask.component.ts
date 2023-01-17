@@ -20,6 +20,10 @@ export class LogoutMetamaskComponent implements OnInit {
     return this.metaMaskService.isAuthenticated$;
   }
 
+  get loggedInAddress$() {
+    return this.metaMaskService.loggedInAddress$;
+  }
+
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
     protected metaMaskService: MetaMaskService

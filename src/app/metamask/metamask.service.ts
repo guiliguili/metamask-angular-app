@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { ethers } from "ethers";
-import { BehaviorSubject, from, Observable } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
 declare var window: any;
@@ -20,8 +20,10 @@ export abstract class BackendUrlProvider {
 }
 
 export abstract class AuthStorage {
-  abstract set(payload: any): void;
-  abstract get$(): Observable<any>;
+  abstract get address(): Observable<string | undefined>;
+  abstract get payload(): Observable<any>;
+  abstract setAuthentication(address: string, payload: any): void;
+  abstract resetAuthentication(): void;
 }
 
 @Injectable({
@@ -35,8 +37,8 @@ export class MetaMaskService implements OnDestroy {
     ethers.providers.Network | undefined
   >(this.network);
 
-  protected _isAuthenticated$ = from(this.authStorage.get$()).pipe(
-    map((payload) => payload !== undefined)
+  protected _isAuthenticated$ = this.authStorage.address.pipe(
+    map((address) => address !== undefined)
   );
 
   protected _account: string | undefined = undefined;
@@ -75,7 +77,6 @@ export class MetaMaskService implements OnDestroy {
     if (this._account !== account) {
       this._account = account;
       this._account$.next(account);
-      this.authStorage.set(undefined);
     }
   }
 
@@ -95,6 +96,10 @@ export class MetaMaskService implements OnDestroy {
 
   get isAuthenticated$(): Observable<boolean> {
     return this._isAuthenticated$;
+  }
+
+  get loggedInAddress$(): Observable<string | undefined> {
+    return this.authStorage.address;
   }
 
   constructor(
@@ -187,7 +192,7 @@ export class MetaMaskService implements OnDestroy {
   };
 
   requestLogin = async () => {
-    this.authStorage.set(undefined);
+    this.authStorage.resetAuthentication();
 
     const signer = await this.getSigner();
     const res = await this.generateNonce();
@@ -211,7 +216,7 @@ export class MetaMaskService implements OnDestroy {
           if (res.valid === true) {
             console.log(`Authenticated ${this.account}`);
             if (this.account !== undefined) {
-              this.authStorage.set(res.payload ?? null);
+              this.authStorage.setAuthentication(address, res.payload ?? null);
               return this.account;
             } else {
               throw Error("No account to login to");
@@ -225,7 +230,7 @@ export class MetaMaskService implements OnDestroy {
   };
 
   logout = async () => {
-    this.authStorage.set(undefined);
+    this.authStorage.resetAuthentication();
   };
 
   requestSendTransaction = async (

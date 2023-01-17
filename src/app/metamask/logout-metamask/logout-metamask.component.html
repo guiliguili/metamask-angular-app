@@ -1,5 +1,6 @@
 <ng-container *ngIf="isConnected$ | async">
     <ng-container *ngIf="isAuthenticated$ | async">
+        Logged-in as <b>{{loggedInAddress$ | async}}</b>
         <form (ngSubmit)="onLogout()">
             <button class="button" type="submit">Logout</button>
         </form>
