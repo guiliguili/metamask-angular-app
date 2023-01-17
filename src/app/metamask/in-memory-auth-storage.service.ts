@@ -13,10 +13,6 @@ export class InMemoryAuthStorageService extends AuthStorage {
     return this._address$.asObservable();
   }
 
-  get payload(): Observable<any> {
-    return this._payload$.asObservable();
-  }
-
   constructor() {
     super();
   }

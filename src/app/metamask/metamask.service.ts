@@ -21,7 +21,6 @@ export abstract class BackendUrlProvider {
 
 export abstract class AuthStorage {
   abstract get address(): Observable<string | undefined>;
-  abstract get payload(): Observable<any>;
   abstract setAuthentication(address: string, payload: any): void;
   abstract resetAuthentication(): void;
 }
