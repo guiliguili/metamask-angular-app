@@ -17,10 +17,6 @@ export class LoginMetaMaskComponent implements OnDestroy {
     return this.metaMaskService.isConnected$;
   }
 
-  get account$() {
-    return this.metaMaskService.account$;
-  }
-
   get isAuthenticated$() {
     return this.metaMaskService.isAuthenticated$;
   }
@@ -32,11 +28,6 @@ export class LoginMetaMaskComponent implements OnDestroy {
 
   ngOnInit(): void {
     this.changeDetectorRef.detectChanges();
-    this.subscriptions.add(
-      this.account$.subscribe((_) => {
-        this.changeDetectorRef.detectChanges();
-      })
-    );
     this.subscriptions.add(
       this.isAuthenticated$.subscribe((_) => {
         this.changeDetectorRef.detectChanges();

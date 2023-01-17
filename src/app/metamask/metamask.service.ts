@@ -24,6 +24,8 @@ export abstract class AuthStorage {
   abstract get$(): Observable<any>;
 }
 
+const storageKey = "ethereumAccount";
+
 @Injectable({
   providedIn: "root",
 })
@@ -35,12 +37,11 @@ export class MetaMaskService implements OnDestroy {
     ethers.providers.Network | undefined
   >(this.network);
 
+  protected _account$ = new BehaviorSubject<string | null>(this.account);
+
   protected _isAuthenticated$ = from(this.authStorage.get$()).pipe(
     map((payload) => payload !== undefined)
   );
-
-  protected _account: string | undefined = undefined;
-  protected _account$ = new BehaviorSubject<string | undefined>(this.account);
 
   get ethereum(): any {
     return window.ethereum;
@@ -54,7 +55,7 @@ export class MetaMaskService implements OnDestroy {
     return this.isEthereumInstalled && (this.ethereum.isMetaMask ?? false);
   }
 
-  get network(): ethers.providers.Network | undefined {
+  protected get network(): ethers.providers.Network | undefined {
     return this._network;
   }
 
@@ -67,19 +68,20 @@ export class MetaMaskService implements OnDestroy {
     return this._network$.asObservable();
   }
 
-  get account(): string | undefined {
-    return this._account;
+  protected get account(): string | null {
+    return localStorage.getItem(storageKey);
   }
 
-  protected set account(account: string | undefined) {
-    if (this._account !== account) {
-      this._account = account;
+  protected set account(account: string | null) {
+    if (this.account !== account) {
+      if (account != null) localStorage.setItem(storageKey, account);
+      else localStorage.removeItem(storageKey);
       this._account$.next(account);
       this.authStorage.set(undefined);
     }
   }
 
-  get account$(): Observable<string | undefined> {
+  get account$(): Observable<string | null> {
     return this._account$.asObservable();
   }
 
@@ -88,7 +90,7 @@ export class MetaMaskService implements OnDestroy {
   }
 
   get isConnected$(): Observable<boolean> {
-    return this._account$.pipe(
+    return this.account$.pipe(
       map((account) => account !== undefined && account !== null)
     );
   }
@@ -123,9 +125,9 @@ export class MetaMaskService implements OnDestroy {
 
   protected onAccountsChanged(accounts: string[]) {
     console.log("onAccountsChanged", accounts);
-    var account: string | undefined;
+    var account: string | null;
     if (accounts === undefined || accounts.length === 0) {
-      account = undefined;
+      account = null;
     } else {
       account = accounts[0];
       if (accounts.length > 1) {
